@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Dowry — Table Booking Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main>
+
+  <section class="slide" id="slide-flow">
+    <div class="slide-inner">
+      <p class="eyebrow">The Dowry — booking a table</p>
+      <h1>Four screens to find out there isn't a table</h1>
+      <p class="lede">
+        Two people, tonight, half seven. This is the actual path through the
+        booking widget on thedowry.co.uk.
+      </p>
+
+      <div class="flow-strip">
+        <div class="flow-step">
+          <p class="flow-step-head"><span class="flow-num">1</span><span class="flow-name">Pick a time</span></p>
+          <img class="flow-shot" src="assets/booking-flow/1-search.png" alt="Book a Table form: party size 2 people, date Today, ideal time, and a Check Availability button">
+          <p class="flow-note">Party size, date, an "ideal time". Nothing here says whether that time can be booked.</p>
+        </div>
+        <div class="flow-step">
+          <p class="flow-step-head"><span class="flow-num">2</span><span class="flow-name">Requirements</span></p>
+          <img class="flow-shot" src="assets/booking-flow/2-requirements.png" alt="Booking requirements screen with checkboxes for wheelchair access, dog friendly and pram accessible">
+          <p class="flow-note">Wheelchair, dog, pram. Sensible questions, asked before you know there's a table.</p>
+        </div>
+        <div class="flow-step">
+          <p class="flow-step-head"><span class="flow-num">3</span><span class="flow-name">Reason for visit</span></p>
+          <img class="flow-shot" src="assets/booking-flow/3-reason.png" alt="Reason for your visit: Evening Food Menu for 19:30, then Drinks, Daytime Food Menu and Drinks after 9pm">
+          <p class="flow-note">Evening Food Menu, then a list of daytime options that don't apply at 19:30.</p>
+        </div>
+        <div class="flow-step">
+          <p class="flow-step-head"><span class="flow-num">4</span><span class="flow-name">No tables</span></p>
+          <img class="flow-shot" src="assets/booking-flow/4-no-tables.png" alt="Sorry, we don't have any tables available for your party size at this time. Try a different time or party size, or get in touch">
+          <p class="flow-note">Then: sorry, try another time. Which time? It doesn't say.</p>
+        </div>
+      </div>
+
+      <div class="flow-tally">
+        <strong>0 tables</strong>
+        <p>The widget knew that before step 2. It downloads the whole evening's availability, table by table, as soon as the page loads.</p>
+      </div>
+
+      <div class="scroll-hint">&darr; scroll or click to continue</div>
+    </div>
+  </section>
+
+  <section class="slide dark" id="slide-data">
+    <div class="slide-inner">
+      <p class="eyebrow">Under the hood</p>
+      <h1>The answer was on the page the whole time</h1>
+      <p class="lede">
+        The booking widget is TableSense. On load it makes one request for the
+        day: every area, every 15-minute slot, every party size, with a count
+        of tables that can actually be booked. No login, no token. We pulled
+        it at 18:21:
+      </p>
+
+      <div class="data-panel">
+        <p class="data-panel-title">GET backend.tablesense.com/booking/…/the-dowry/booking-slot-availability</p>
+        <pre><code>{
+  "bookingSlot": { "dateTime": "2026-10-15T20:00:00" },
+  "options": [{
+    "partySize": 2,
+    "reasonId": "4a851387-…",  <span class="tok-dim">// Evening Food Menu</span>
+    "allTableCount": 9,
+    "reservableTableCount": <span class="tok-amber">0</span>
+  }, …]
+}</code></pre>
+      </div>
+      <p class="panel-footnote">Every slot from 18:30 to 20:30, in all six areas: nothing bookable for two. The first table opens at 20:45, under "Drinks after 9pm". The widget had all of this before the first button was pressed.</p>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-bar">
+    <div class="slide-inner">
+      <p class="eyebrow">The improvement</p>
+      <h1>Lead with what you can book</h1>
+      <p class="lede">
+        We built this as a small Chrome extension to prove the point. It reads
+        the same data and shows it as one line across the top of
+        thedowry.co.uk.
+      </p>
+
+      <div class="bar-frame">
+        <div class="bar-frame-bar"><span class="dot"></span>thedowry.co.uk</div>
+        <img src="assets/improvement-bar.png" alt="A dark bar across the top of thedowry.co.uk reading: Tonight, table for 2. Drinks after 9pm: 20:45, 21:00, 21:15. Table: 21:30, 21:45, 22:00">
+      </div>
+
+      <div class="points">
+        <p class="point"><strong>One glance, before any form.</strong> Tonight, for two: 20:45 to 21:15 for drinks, or a table from 21:30. No screens to go through first.</p>
+        <p class="point"><strong>Change the party size, it updates instantly.</strong> No extra requests. The data is already in the page.</p>
+
+        <p class="points-title">Built into the widget, it could go further</p>
+        <p class="point"><strong>Grey out times that can't be booked.</strong> The time picker on step 1 can show which slots have a table for your party size.</p>
+        <p class="point"><strong>Let the time choose the reason.</strong> Pick 20:45 and it's "Drinks after 9pm". There's no need to ask.</p>
+        <p class="point"><strong>Ask about access after a slot is chosen.</strong> Each table already carries wheelchair, dog and pram flags, so the answers can narrow the result instead of coming before it.</p>
+        <p class="point"><strong>If the night is full, say so on the first screen,</strong> with the phone number, not after three steps.</p>
+      </div>
+
+      <div class="source-tag">
+        <span class="swatch"></span>
+        Live TableSense data, captured 15 October 2026
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-try">
+    <div class="slide-inner">
+      <p class="eyebrow">Try it</p>
+      <h1>This is the whole trick</h1>
+      <p class="lede">
+        The bar below runs on a real week of The Dowry's availability, captured
+        from the same request. Change the party size or the day.
+      </p>
+
+      <div class="bar-frame demo-frame">
+        <div class="bar-frame-bar"><span class="dot"></span>thedowry.co.uk</div>
+        <div class="demo-bar" id="demo-bar">
+          <span class="demo-controls">
+            Table for
+            <select id="demo-size" aria-label="Party size"></select>
+            on
+            <select id="demo-day" aria-label="Day"></select>
+          </span>
+          <span class="demo-body" id="demo-body"></span>
+        </div>
+        <div class="demo-page" aria-hidden="true"></div>
+      </div>
+
+      <div class="data-panel code-panel">
+        <p class="data-panel-title">Everything it does with the response</p>
+        <pre><code><span class="tok-dim">// data = the availability response the widget already downloads</span>
+const free = {};
+for (const area of data.areas)
+  for (const slot of area.bookingSlots)
+    for (const opt of slot.options)
+      if (opt.partySize === partySize &amp;&amp; opt.reservableTableCount &gt; 0)
+        (free[reasonName(opt.reasonId)] ??= new Set())
+          .add(slot.bookingSlot.dateTime.slice(11, 16));</code></pre>
+      </div>
+      <p class="point demo-note">No new API, no backend change. The page already has this data, so it only needs to show it.</p>
+
+      <div class="source-tag">
+        <span class="swatch"></span>
+        TableSense availability for 15&ndash;21 October 2026, captured the evening of 15 October
+      </div>
+    </div>
+  </section>
+
+</main>
+<script>
+  // Snapshot of booking-slot-availability, reduced to:
+  // day -> reason -> time -> bitmask of party sizes with a bookable table.
+  var SNAPSHOT = {"2026-10-15":{"Drinks after 9pm":{"20:45":510,"21:00":510,"21:15":510},"Table":{"21:30":510,"21:45":510,"22:00":510}},"2026-10-16":{"Brunch":{"10:00":510,"10:15":510,"10:30":254,"10:45":510,"11:00":14,"11:15":510,"11:30":510,"11:45":510,"12:15":510,"12:30":2,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Drinks":{"10:00":510,"10:15":510,"10:30":254,"10:45":510,"11:00":14,"11:15":510,"11:30":510,"11:45":510,"12:15":510,"12:30":2,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510,"15:45":510,"16:00":510,"16:15":510,"16:30":510,"16:45":510},"Daytime Food Menu":{"12:15":510,"12:30":2,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Evening Food Menu":{"17:00":510,"17:15":508,"17:30":508,"17:45":508,"18:00":28,"18:15":508,"19:00":14,"19:15":510,"19:30":6,"19:45":510,"20:00":510,"20:15":510},"Drinks after 9pm":{"20:30":510,"20:45":510,"21:00":510,"21:15":510,"21:30":510,"21:45":510,"22:00":510,"22:15":510},"Table":{"22:30":510,"22:45":510,"23:00":510}},"2026-10-17":{"Brunch":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":62,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":254,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Drinks":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":62,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":254,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510,"15:45":510,"16:00":510,"16:15":510,"16:30":510,"16:45":510},"Daytime Food Menu":{"12:00":62,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":254,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Evening Food Menu":{"17:15":62,"17:30":30,"17:45":30,"18:15":12,"19:45":30,"20:00":30,"20:15":510},"Drinks after 9pm":{"20:30":510,"20:45":510,"21:00":510,"21:15":510,"21:30":510,"21:45":510,"22:00":510,"22:15":510},"Table":{"22:30":510,"22:45":510,"23:00":510}},"2026-10-18":{"Brunch":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Drinks":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510,"15:15":510,"15:30":510,"15:45":510,"16:00":510,"16:15":510},"Daytime Food Menu":{"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510}},"2026-10-19":{"Brunch":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Drinks":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510,"15:15":510,"15:30":510,"15:45":510,"16:00":510,"16:15":510,"16:30":510,"16:45":510},"Daytime Food Menu":{"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Evening Food Menu":{"17:00":510,"17:15":510,"17:30":510,"17:45":510,"18:00":510,"18:15":510,"18:30":510,"18:45":510,"19:00":510,"19:15":510,"19:30":510,"19:45":510,"20:00":510,"20:15":510},"Drinks after 9pm":{"20:30":510,"20:45":510,"21:00":510,"21:15":510},"Table":{"21:30":510,"21:45":510,"22:00":510}},"2026-10-20":{"Brunch":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Drinks":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510,"15:15":510,"15:30":510,"15:45":510,"16:00":510,"16:15":510,"16:30":510,"16:45":510},"Daytime Food Menu":{"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Evening Food Menu":{"17:00":510,"17:15":510,"17:30":510,"17:45":510,"18:00":510,"18:15":510,"18:30":510,"18:45":510,"19:00":510,"19:15":510,"19:30":510,"19:45":126,"20:00":510,"20:15":510},"Drinks after 9pm":{"20:30":510,"20:45":510,"21:00":510,"21:15":510},"Table":{"21:30":510,"21:45":510,"22:00":510}},"2026-10-21":{"Brunch":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Drinks":{"10:00":510,"10:15":510,"10:30":510,"10:45":510,"11:00":510,"11:15":510,"11:30":510,"11:45":510,"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510,"15:15":510,"15:30":510,"15:45":510,"16:00":510,"16:15":510,"16:30":510,"16:45":510},"Daytime Food Menu":{"12:00":510,"12:15":510,"12:30":510,"12:45":510,"13:00":510,"13:15":510,"13:30":510,"13:45":510,"14:00":510,"14:15":510,"14:30":510,"14:45":510,"15:00":510},"Evening Food Menu":{"17:00":510,"17:15":510,"17:30":510,"17:45":510,"18:00":510,"18:15":510,"18:30":510,"18:45":510,"19:00":510,"19:15":510,"19:30":510,"19:45":510,"20:00":510,"20:15":510},"Drinks after 9pm":{"20:30":510,"20:45":510,"21:00":510,"21:15":510},"Table":{"21:30":510,"21:45":510,"22:00":510}}};
+  var PHONE = '01595 69 2373';
+
+  (function () {
+    var sizeEl = document.getElementById('demo-size');
+    var dayEl = document.getElementById('demo-day');
+    var bodyEl = document.getElementById('demo-body');
+    var days = Object.keys(SNAPSHOT);
+
+    for (var n = 1; n <= 8; n++) sizeEl.add(new Option(String(n), String(n), false, n === 2));
+    days.forEach(function (d, i) {
+      var label = i === 0 ? 'Tonight' : new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+      dayEl.add(new Option(label, d));
+    });
+
+    function mins(t) { return +t.slice(0, 2) * 60 + +t.slice(3); }
+
+    // Collapse consecutive 15-minute slots into ranges: 17:00–18:30, 19:45
+    function ranges(times) {
+      var out = [];
+      times.forEach(function (t) {
+        var last = out[out.length - 1];
+        if (last && mins(t) - mins(last[1]) === 15) last[1] = t;
+        else out.push([t, t]);
+      });
+      return out.map(function (r) { return r[0] === r[1] ? r[0] : r[0] + '–' + r[1]; });
+    }
+
+    function render() {
+      var size = +sizeEl.value;
+      var reasons = SNAPSHOT[dayEl.value] || {};
+      var html = Object.keys(reasons).map(function (name) {
+        var times = Object.keys(reasons[name]).filter(function (t) { return reasons[name][t] & (1 << size); });
+        if (!times.length) return '';
+        return '<span class="demo-group"><span class="demo-reason">' + name + '</span>' +
+          ranges(times).map(function (r) { return '<span class="demo-time">' + r + '</span>'; }).join('') + '</span>';
+      }).join('');
+      bodyEl.innerHTML = html || '<span class="demo-none">No tables for ' + size + '. Call ' + PHONE + '</span>';
+    }
+
+    sizeEl.addEventListener('change', render);
+    dayEl.addEventListener('change', render);
+    render();
+  })();
+</script>
+<script>
+  (function () {
+    var slides = Array.from(document.querySelectorAll('.slide'));
+    var isDesktopPointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+    document.addEventListener('click', function (e) {
+      if (!isDesktopPointer.matches) return;
+      if (e.target.closest('a, button, input, select, textarea')) return;
+
+      var mid = window.innerHeight / 2;
+      var current = slides.findIndex(function (s) {
+        var r = s.getBoundingClientRect();
+        return r.top <= mid && r.bottom >= mid;
+      });
+      var next = slides[current + 1];
+      if (next) next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  })();
+</script>
+</body>
+</html>
