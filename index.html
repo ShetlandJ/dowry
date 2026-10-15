@@ -55,28 +55,23 @@
 
   <section class="slide dark" id="slide-data">
     <div class="slide-inner">
-      <p class="eyebrow">Under the hood</p>
+      <p class="eyebrow">Behind the scenes</p>
       <h1>The answer was on the page the whole time</h1>
       <p class="lede">
-        The booking widget is TableSense. On load it makes one request for the
-        day: every area, every 15-minute slot, every party size, with a count
-        of tables that can actually be booked. No login, no token. We pulled
-        it at 18:21:
+        As soon as thedowry.co.uk opens, the booking system loads the whole
+        evening in the background: every table, every time, every party size.
+        This is what it already knew for two people tonight, before a single
+        button was pressed.
       </p>
 
-      <div class="data-panel">
-        <p class="data-panel-title">GET backend.tablesense.com/booking/…/the-dowry/booking-slot-availability</p>
-        <pre><code>{
-  "bookingSlot": { "dateTime": "2026-10-15T20:00:00" },
-  "options": [{
-    "partySize": 2,
-    "reasonId": "4a851387-…",  <span class="tok-dim">// Evening Food Menu</span>
-    "allTableCount": 9,
-    "reservableTableCount": <span class="tok-amber">0</span>
-  }, …]
-}</code></pre>
+      <div class="tonight">
+        <p class="tonight-label">Tonight, table for two</p>
+        <div class="tonight-slots">
+          <span class="tslot off">18:30</span><span class="tslot off">18:45</span><span class="tslot off">19:00</span><span class="tslot off">19:15</span><span class="tslot off">19:30</span><span class="tslot off">19:45</span><span class="tslot off">20:00</span><span class="tslot off">20:15</span><span class="tslot off">20:30</span><span class="tslot on">20:45</span><span class="tslot on">21:00</span><span class="tslot on">21:15</span><span class="tslot on">21:30</span><span class="tslot on">21:45</span><span class="tslot on">22:00</span>
+        </div>
+        <p class="tonight-key"><span class="tslot off">19:30</span> fully booked <span class="tslot on">20:45</span> table free</p>
       </div>
-      <p class="panel-footnote">Every slot from 18:30 to 20:30, in all six areas: nothing bookable for two. The first table opens at 20:45, under "Drinks after 9pm". The widget had all of this before the first button was pressed.</p>
+      <p class="panel-footnote">Nothing for two until 20:45. The booking form still let us pick 19:30 and go through three more screens before saying so.</p>
     </div>
   </section>
 
@@ -97,12 +92,12 @@
 
       <div class="points">
         <p class="point"><strong>One glance, before any form.</strong> Tonight, for two: 20:45 to 21:15 for drinks, or a table from 21:30. No screens to go through first.</p>
-        <p class="point"><strong>Change the party size, it updates instantly.</strong> No extra requests. The data is already in the page.</p>
+        <p class="point"><strong>Change the party size, it updates instantly.</strong> The information is already there, so there's nothing to wait for.</p>
 
         <p class="points-title">Built into the widget, it could go further</p>
         <p class="point"><strong>Grey out times that can't be booked.</strong> The time picker on step 1 can show which slots have a table for your party size.</p>
         <p class="point"><strong>Let the time choose the reason.</strong> Pick 20:45 and it's "Drinks after 9pm". There's no need to ask.</p>
-        <p class="point"><strong>Ask about access after a slot is chosen.</strong> Each table already carries wheelchair, dog and pram flags, so the answers can narrow the result instead of coming before it.</p>
+        <p class="point"><strong>Ask about access after a slot is chosen.</strong> The system already knows which tables suit wheelchairs, dogs and prams, so it can narrow the times down instead of asking first.</p>
         <p class="point"><strong>If the night is full, say so on the first screen,</strong> with the phone number, not after three steps.</p>
       </div>
 
@@ -116,10 +111,10 @@
   <section class="slide" id="slide-try">
     <div class="slide-inner">
       <p class="eyebrow">Try it</p>
-      <h1>This is the whole trick</h1>
+      <h1>Real tables, this week</h1>
       <p class="lede">
-        The bar below runs on a real week of The Dowry's availability, captured
-        from the same request. Change the party size or the day.
+        This works. It's running on a real week of The Dowry's availability,
+        taken from the booking system. Change the party size or the day.
       </p>
 
       <div class="bar-frame demo-frame">
@@ -136,18 +131,10 @@
         <div class="demo-page" aria-hidden="true"></div>
       </div>
 
-      <div class="data-panel code-panel">
-        <p class="data-panel-title">Everything it does with the response</p>
-        <pre><code><span class="tok-dim">// data = the availability response the widget already downloads</span>
-const free = {};
-for (const area of data.areas)
-  for (const slot of area.bookingSlots)
-    for (const opt of slot.options)
-      if (opt.partySize === partySize &amp;&amp; opt.reservableTableCount &gt; 0)
-        (free[reasonName(opt.reasonId)] ??= new Set())
-          .add(slot.bookingSlot.dateTime.slice(11, 16));</code></pre>
+      <div class="points">
+        <p class="point"><strong>Nothing new to build behind the scenes.</strong> Your booking system already works all of this out on every visit. It's a change to what the customer sees, not to how bookings work.</p>
+        <p class="point"><strong>Who would do it.</strong> The booking form is made by TableSense, so they're the ones to ask. Whoever looks after your website or your TableSense account can pass this page on to them.</p>
       </div>
-      <p class="point demo-note">No new API, no backend change. The page already has this data, so it only needs to show it.</p>
 
       <div class="source-tag">
         <span class="swatch"></span>
