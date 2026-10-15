@@ -42,11 +42,11 @@ body {
 
 .eyebrow {
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.12em;
+  font-size: clamp(16px, 2vw, 19px);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--red);
-  margin: 0 0 16px;
+  margin: 0 0 18px;
 }
 
 h1 {
